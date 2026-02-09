@@ -22,8 +22,6 @@ DEFAULT_FEEDS = [
     "https://www.therobotreport.com/feed/",
     # ROS Discourse
     "https://discourse.ros.org/latest.rss",
-    # Hacker News (filtered later)
-    "https://hnrss.org/newest?q=robotics+OR+ros2+OR+slam+OR+manipulation",
 ]
 
 

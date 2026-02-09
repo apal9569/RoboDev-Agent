@@ -7,9 +7,8 @@ import re
 
 FILTER_PROMPT_TEMPLATE = """You are a robotics news curator for an engineer with this profile:
 - Stack: {stack}
-- Simulator: {sim}
 - Robot type: {robot_type}
-- Interests: motion planning, control, perception, SLAM, manipulation, sim-to-real
+- Interests: {interests}
 
 Here are today's articles (title | source | abstract):
 {article_block}
@@ -17,7 +16,7 @@ Here are today's articles (title | source | abstract):
 Tasks:
 1. Score each article 0-10 for relevance to the engineer's profile.
 2. Pick the TOP 10 most relevant.
-3. For each, write a 2-3 sentence actionable summary (what's new, why it matters, link to paper/code if mentioned).
+3. For each, write a paragraph of actionable summary (what's new, why it matters, link to paper/code if mentioned).
 4. Group into categories: 🔬 Research, 🛠 Tools/Libraries, 📰 Industry News, 💡 Tutorials
 
 Output JSON:
@@ -65,8 +64,8 @@ def build_digest(llm, memory, force: bool = False, email: bool = False) -> str:
     m = memory.data
     prompt = FILTER_PROMPT_TEMPLATE.format(
         stack=m.get("stack", "ROS2"),
-        sim=m.get("sim", "Gazebo"),
         robot_type=m.get("robot_type", "general"),
+        interests=m.get("interests", "motion planning, control, perception, SLAM, manipulation, sim-to-real, Simulation"),
         article_block=article_block,
         today=today,
     )
