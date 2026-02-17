@@ -1,5 +1,5 @@
 from pathlib import Path
-from robodev.llm_client import OllamaClient
+from robodev.clients.llm_client import OllamaClient
 from robodev.prompts import (
     system_prompt,
     brainstorm_prompt,

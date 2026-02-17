@@ -4,6 +4,7 @@ from robodev.daily_digest.feed_parser import Article, fetch_feeds, save_digest, 
 from robodev.daily_digest.send_mail import send_digest_email
 import json
 import re
+from robodev.clients.gemini_client import GeminiClient
 
 FILTER_PROMPT_TEMPLATE = """You are a robotics news curator for an engineer with this profile:
 - Stack: {stack}
@@ -54,7 +55,7 @@ def build_digest(llm, memory, force: bool = False, email: bool = False) -> str:
         return "No articles fetched today."
 
     # Limit to 20 articles max and truncate summaries
-    articles = articles[:20]
+    articles = articles[:100]
     article_block = "\n".join(
         f"- {a.title.strip()} | {a.source.strip()} | {a.summary[:100].strip()}"
         for a in articles
@@ -73,12 +74,17 @@ def build_digest(llm, memory, force: bool = False, email: bool = False) -> str:
     print(f"📡 Fetched {len(articles)} articles, prompt size: {len(prompt)} chars")
 
     try:
-        raw = llm.chat(prompt, timeout=300, task="digest")
-    except Exception as e:
-        result = f"❌ LLM call failed: {e}"
-        if email:
-            _send_email(today, result)
-        return result
+        gemini = GeminiClient()
+        raw = gemini.chat(prompt, timeout=300, task="digest")
+    except (ValueError, RuntimeError) as e:
+        print(f"⚠ Gemini unavailable ({e}), falling back to Ollama")
+        try:
+            raw = llm.chat(prompt, timeout=300, task="digest")
+        except Exception as e2:
+            result = f"❌ LLM call failed: {e2}"
+            if email:
+                _send_email(today, result)
+            return result
 
     try:
         # Extract JSON from response (LLM sometimes wraps it in markdown)
