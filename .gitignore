@@ -1,3 +1,5 @@
 .roboagent/
-.robodev_agent.egg-info/
-.robodev/__pycache__/
+robodev_agent.egg-info/
+robodev/__pycache__/
+robodev/clients/__pycache__/
+robodev/daily_digest/__pycache__/
